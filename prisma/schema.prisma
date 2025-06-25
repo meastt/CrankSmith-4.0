@@ -1,0 +1,203 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// Core component models
+model Cassette {
+  id                  String   @id @default(cuid())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  
+  // Basic info
+  manufacturer       String
+  series            String?
+  model             String
+  year              Int?
+  weight            Int?     // grams
+  bikeType          String   // mtb, road, gravel, hybrid
+  msrp              Int?     // cents (so $165.99 = 16599)
+  imageUrl          String?
+  
+  // Cassette specific
+  speeds            Int
+  cogs              String   // "10-12-14-16-18-21-24-28-33-39-45-51"
+  freehubStandard   String   // "Shimano HG", "SRAM XD", "Shimano Microspline"
+  chainCompatibility String  // "Shimano HG+", "SRAM Eagle", "11-speed"
+  
+  // Advanced specs
+  cogMaterial       String?  // "steel,steel,aluminum,aluminum..."
+  spiderMaterial    String?  // "aluminum", "steel", "none"
+  spacing           Float?   // mm between cogs
+  
+  // Relations
+  builds            Build[]
+  compatibilityChecks CompatibilityCheck[]
+  
+  @@map("cassettes")
+}
+
+model Chain {
+  id                  String   @id @default(cuid())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  
+  // Basic info
+  manufacturer       String
+  series            String?
+  model             String
+  year              Int?
+  weight            Int?     // grams
+  bikeType          String   
+  msrp              Int?     
+  imageUrl          String?
+  
+  // Chain specific
+  speeds            Int
+  chainStandard     String   // "HG", "HG+", "Eagle", "Flat Top"
+  links             Int?     // number of links
+  masterLink        String?  // "PowerLink", "MissingLink", "QuickLink"
+  
+  // Advanced specs
+  innerWidth        Float?   // mm
+  outerWidth        Float?   // mm
+  coating           String?  // "nickel", "titanium nitride", "DLC"
+  
+  // Relations
+  builds            Build[]
+  compatibilityChecks CompatibilityCheck[]
+  
+  @@map("chains")
+}
+
+model RearDerailleur {
+  id                  String   @id @default(cuid())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  
+  // Basic info
+  manufacturer       String
+  series            String?
+  model             String
+  year              Int?
+  weight            Int?     
+  bikeType          String   
+  msrp              Int?     
+  imageUrl          String?
+  
+  // Derailleur specific
+  speeds            Int
+  cageLength        String   // "short", "medium", "long"
+  maxCogSize        Int      // largest cog it can handle
+  minCogSize        Int?     // smallest cog
+  totalCapacity     Int?     // teeth
+  
+  // Compatibility
+  shiftingStandard  String   // "Shimano", "SRAM", "Campagnolo"
+  pullRatio         String?  // "1:1", "1.1:1", "1.3:1"
+  
+  // Advanced specs
+  jockeyWheelSize   Int?     // mm
+  clutch            Boolean  @default(false)
+  
+  // Relations
+  builds            Build[]
+  compatibilityChecks CompatibilityCheck[]
+  
+  @@map("rear_derailleurs")
+}
+
+model Crankset {
+  id                  String   @id @default(cuid())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  
+  // Basic info
+  manufacturer       String
+  series            String?
+  model             String
+  year              Int?
+  weight            Int?     
+  bikeType          String   
+  msrp              Int?     
+  imageUrl          String?
+  
+  // Crankset specific
+  chainrings        String   // "32" or "50-34" or "50-39-30"
+  bbStandard        String   // "BSA", "BB30", "PF30", "BB86", "T47"
+  crankLength       Int      // mm
+  
+  // Advanced specs
+  chainline         Float?   // mm
+  qFactor           Float?   // mm
+  bcd               String?  // "104mm" or "110/74mm" (for double)
+  
+  // Relations
+  builds            Build[]
+  compatibilityChecks CompatibilityCheck[]
+  
+  @@map("cranksets")
+}
+
+// User builds and compatibility checks
+model Build {
+  id                  String   @id @default(cuid())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  
+  name               String?
+  bikeType          String
+  
+  // Components (optional - user might not select all)
+  cassetteId        String?
+  cassette          Cassette? @relation(fields: [cassetteId], references: [id])
+  
+  chainId           String?
+  chain             Chain? @relation(fields: [chainId], references: [id])
+  
+  rearDerailleurId  String?
+  rearDerailleur    RearDerailleur? @relation(fields: [rearDerailleurId], references: [id])
+  
+  cranksetId        String?
+  crankset          Crankset? @relation(fields: [cranksetId], references: [id])
+  
+  // Analysis results
+  compatibilityScore Int?     // 0-100
+  gearRatioMin      Float?
+  gearRatioMax      Float?
+  gearRatioRange    Float?
+  
+  @@map("builds")
+}
+
+model CompatibilityCheck {
+  id                  String   @id @default(cuid())
+  createdAt          DateTime @default(now())
+  
+  // What was checked
+  cassetteId        String?
+  cassette          Cassette? @relation(fields: [cassetteId], references: [id])
+  
+  chainId           String?
+  chain             Chain? @relation(fields: [chainId], references: [id])
+  
+  rearDerailleurId  String?
+  rearDerailleur    RearDerailleur? @relation(fields: [rearDerailleurId], references: [id])
+  
+  cranksetId        String?
+  crankset          Crankset? @relation(fields: [cranksetId], references: [id])
+  
+  // Results
+  isCompatible      Boolean
+  warnings          String?  // JSON string of warning messages
+  issues            String?  // JSON string of compatibility issues
+  
+  @@map("compatibility_checks")
+}
