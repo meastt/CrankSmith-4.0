@@ -1,0 +1,14 @@
+// Component exports for easier imports
+export { ComponentSelector } from './ComponentSelector';
+export { CompatibilityResults } from './CompatibilityResults';
+export { ComponentCard } from './ComponentCard';
+export { ComponentFilters } from './ComponentFilters';
+export { ComponentSpecs } from './ComponentSpecs';
+export { BuildStepIndicator } from './BuildStepIndicator';
+export { BikeTypeSelector } from './BikeTypeSelector';
+export { ComponentStepSelector } from './ComponentStepSelector';
+export { BuildSummary } from './BuildSummary';
+export { AnalysisSetup } from './AnalysisSetup';
+export { PerformanceMetrics } from './PerformanceMetrics';
+export { OptimizationRecommendations } from './OptimizationRecommendations';
+export { BuildComparison } from './BuildComparison';

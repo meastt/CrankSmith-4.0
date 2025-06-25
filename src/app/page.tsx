@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronRight, Check, Settings, TrendingUp, Mountain } from 'lucide-react';
 
@@ -65,12 +65,14 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-8">
-              <div className="flex-shrink-0">
+              <nav className="hidden md:flex space-x-8">
+                <a href="/database" className="text-neutral-600 hover:text-neutral-900">Database</a>
+                <a href="#" className="text-neutral-600 hover:text-neutral-900">About</a>
+              </nav><div className="flex-shrink-0">
                 <h1 className="text-xl font-bold text-neutral-900">CrankSmith</h1>
               </div>
               <nav className="hidden md:flex space-x-8">
-                <a href="#" className="text-neutral-600 hover:text-neutral-900">Tools</a>
-                <a href="#" className="text-neutral-600 hover:text-neutral-900">Database</a>
+                <a href="/database" className="text-neutral-600 hover:text-neutral-900">Database</a>
                 <a href="#" className="text-neutral-600 hover:text-neutral-900">About</a>
               </nav>
             </div>
